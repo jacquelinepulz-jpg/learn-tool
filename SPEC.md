@@ -67,6 +67,14 @@ Die App hilft Studierenden, sich auf ihre Prüfungen vorzubereiten. Sie macht zw
 - Alle Daten werden automatisch im Browser gespeichert.
 - Nach dem Neuladen der Seite sind alle Daten noch da.
 
+**Daten sichern (Export und Import)** (nachträglich ergänzt)
+- Auf der Startseite gibt es einen Bereich „Daten sichern“.
+- **Exportieren:** lädt alle Daten als Datei `lerntool-sicherung-JJJJ-MM-TT.json` herunter.
+- **Importieren:** liest so eine Datei wieder ein.
+  - Vorher fragt die App nach, denn der Import **ersetzt** alle aktuellen Daten. Die Nachfrage nennt, wie viele Module jetzt da sind und wie viele in der Datei stehen.
+  - Ist die Datei keine gültige Sicherung, erscheint eine verständliche Meldung und die aktuellen Daten bleiben unverändert.
+- So kann man Daten auf ein anderes Gerät oder in einen anderen Browser mitnehmen.
+
 ### Soll (die zwei sichtbaren Highlights)
 
 1. **Prüfungs-Countdown auf der Startseite**
@@ -85,7 +93,8 @@ Die App hilft Studierenden, sich auf ihre Prüfungen vorzubereiten. Sie macht zw
 - Kein Hochladen von PDF-, Word- oder PowerPoint-Dateien. Stattdessen gibt es den Hinweis zum Kopieren von Text aus PDFs.
 - Keine Texterkennung in Fotos und keine Bilder auf Karteikarten. Stattdessen gibt es den Hinweis zum Kopieren von Text aus Fotos.
 - Keine Konten, keine Anmeldung, kein Server.
-- Kein Abgleich zwischen Geräten und kein Export oder Import.
+- Kein automatischer Abgleich zwischen Geräten. Daten mitnehmen geht nur von Hand über Export und Import.
+- Kein Zusammenführen beim Import. Eine Sicherung ersetzt immer alle Daten.
 - Keine Erinnerungen oder Benachrichtigungen.
 - Kein Bearbeiten einzelner Karteikarten (nur Unterlage löschen und neu anlegen).
 - Kein Lernsystem mit Wiederholungsabständen über mehrere Tage (Spaced Repetition).
@@ -142,13 +151,15 @@ Gestaltung:
 - Nur HTML, CSS und JavaScript. Keine externen Bibliotheken, keine Schriften oder Dateien aus dem Internet.
 - Drei Dateien: `index.html`, `style.css`, `app.js`.
 - Die App funktioniert durch einen Doppelklick auf `index.html`, ganz ohne Server.
+- Zusätzlich ist sie über GitHub Pages online erreichbar: https://jacquelinepulz-jpg.github.io/learn-tool/ (nachträglich ergänzt). GitHub Pages zeigt einfach die Dateien aus dem Zweig `main` an. Ein eigener Server oder ein Build-Schritt ist nicht nötig.
 - Dateien werden mit dem `FileReader` des Browsers eingelesen.
 - Keine Passwörter oder Schlüssel in Dateien.
 
 **Grenzen**
 - Die Qualität der Karten hängt davon ab, wie der Text aufgebaut ist. Fließtext ohne Definitionen ergibt wenige oder keine Karten.
 - Der Browser-Speicher fasst etwa 5 MB. Sehr viele oder sehr lange Unterlagen passen nicht hinein. Wenn das Speichern fehlschlägt, zeigt die App eine Meldung.
-- Wer die Browserdaten löscht oder einen anderen Browser oder ein anderes Gerät benutzt, sieht seine Daten nicht mehr.
+- Wer die Browserdaten löscht oder einen anderen Browser oder ein anderes Gerät benutzt, sieht seine Daten nicht mehr, außer er hat sie vorher exportiert.
+- Die Online-Version und die Datei auf dem PC haben **getrennte** Speicher. Daten wandern zwischen beiden nur über Export und Import.
 - Die App muss in einer Runde baubar sein. Alles, was über diese SPEC hinausgeht, kommt später.
 
 ## 7. Abnahmekriterien
@@ -178,3 +189,10 @@ Die App gilt als fertig, wenn alle Punkte erfüllt sind:
 13. Bei einer Unterlage ohne passende Muster erscheint ein verständlicher Hinweis statt eines Fehlers.
 14. Bei einer Breite von 360 px gibt es keinen waagerechten Scrollbalken und alle Knöpfe sind bedienbar.
 15. Der Code verwendet keine externe Bibliothek und enthält keine Passwörter oder Schlüssel.
+
+Nachträglich ergänzt:
+
+16. „Daten exportieren“ lädt eine .json-Datei herunter, in der alle Module, Themen, Unterlagen und Karten stehen.
+17. Ich lösche ein Modul und importiere danach die Sicherung. Nach der Nachfrage ist alles wieder da, auch nach dem Neuladen.
+18. Beim Import einer falschen Datei (z. B. einer beliebigen .txt- oder .json-Datei) erscheint eine verständliche Meldung, und meine Daten bleiben unverändert.
+19. Die App öffnet sich unter https://jacquelinepulz-jpg.github.io/learn-tool/ und funktioniert dort genauso wie lokal.

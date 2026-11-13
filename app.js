@@ -230,6 +230,81 @@ function fortschritt(modul) {
 }
 
 /* =========================================================
+   Sicherung prüfen (für den Import)
+   ========================================================= */
+
+const DATUM_MUSTER = /^\d{4}-\d{2}-\d{2}$/;
+
+// Prüft eine eingelesene Sicherung und gibt saubere Daten zurück.
+// Wirft einen Fehler mit verständlicher Meldung, wenn etwas nicht passt.
+// Es werden nur bekannte Felder übernommen.
+function sicherungPruefen(roh) {
+  function fehler(grund) {
+    throw new Error("Die Datei ist keine gültige Sicherung des Lerntools (" + grund + ").");
+  }
+  function text(wert, wo) {
+    if (typeof wert !== "string") fehler(wo + " fehlt");
+    return wert;
+  }
+  function datum(wert, wo) {
+    if (typeof wert !== "string" || !DATUM_MUSTER.test(wert)) fehler(wo + " ist kein Datum");
+    return wert;
+  }
+  function liste(wert, wo) {
+    if (wert === undefined) return [];
+    if (!Array.isArray(wert)) fehler(wo + " ist keine Liste");
+    return wert;
+  }
+
+  if (!roh || typeof roh !== "object" || !Array.isArray(roh.module)) fehler("keine Module gefunden");
+
+  const module = roh.module.map((m, i) => {
+    const wo = "Modul " + (i + 1);
+    if (!m || typeof m !== "object") fehler(wo + " ist leer");
+    if (!text(m.name, wo + ": Name").trim()) fehler(wo + ": Name ist leer");
+    return {
+      id: text(m.id, wo + ": ID"),
+      name: m.name,
+      pruefungsdatum: datum(m.pruefungsdatum, wo + ": Prüfungsdatum"),
+      themen: liste(m.themen, wo + ": Themen").map((t, j) => {
+        const woT = wo + ", Thema " + (j + 1);
+        if (!t || typeof t !== "object") fehler(woT + " ist leer");
+        return {
+          id: text(t.id, woT + ": ID"),
+          titel: text(t.titel, woT + ": Titel"),
+          tag: t.tag === null || t.tag === undefined || t.tag === "" ? null : datum(t.tag, woT + ": Tag"),
+          erledigt: t.erledigt === true,
+        };
+      }),
+      wiederholung: liste(m.wiederholung, wo + ": Wiederholung").map((d) => datum(d, wo + ": Wiederholungstag")),
+      unterlagen: liste(m.unterlagen, wo + ": Unterlagen").map((u, j) => {
+        const woU = wo + ", Unterlage " + (j + 1);
+        if (!u || typeof u !== "object") fehler(woU + " ist leer");
+        return {
+          id: text(u.id, woU + ": ID"),
+          titel: text(u.titel, woU + ": Titel"),
+          text: text(u.text, woU + ": Text"),
+          karten: liste(u.karten, woU + ": Karten").map((k, n) => {
+            const woK = woU + ", Karte " + (n + 1);
+            if (!k || typeof k !== "object") fehler(woK + " ist leer");
+            if (k.typ !== "definition" && k.typ !== "luecke") fehler(woK + ": unbekannter Typ");
+            return {
+              id: text(k.id, woK + ": ID"),
+              typ: k.typ,
+              frage: text(k.frage, woK + ": Frage"),
+              antwort: text(k.antwort, woK + ": Antwort"),
+              begriff: text(k.begriff, woK + ": Begriff"),
+            };
+          }),
+        };
+      }),
+    };
+  });
+
+  return { module };
+}
+
+/* =========================================================
    Speichern und Laden
    ========================================================= */
 
@@ -378,7 +453,105 @@ function zeigeStart() {
     el("button", { type: "submit", class: "knopf", text: "Modul anlegen" })
   );
 
-  return [uebersicht, abschnitt(el("h2", { text: "+ Modul anlegen" }), formular)];
+  const teile = [];
+  if (meldung) {
+    teile.push(el("p", { class: "erfolg", role: "status", text: meldung }));
+    meldung = null;
+  }
+  teile.push(uebersicht, abschnitt(el("h2", { text: "+ Modul anlegen" }), formular), sicherungAbschnitt());
+  return teile;
+}
+
+// ---------- Daten sichern (Export und Import) ----------
+
+function exportieren() {
+  if (daten.module.length === 0) {
+    alert("Es gibt noch nichts zu sichern. Lege zuerst ein Modul an.");
+    return;
+  }
+  const inhalt = {
+    app: "lerntool",
+    version: 1,
+    exportiertAm: new Date().toISOString(),
+    module: daten.module,
+  };
+  const datei = new Blob([JSON.stringify(inhalt, null, 2)], { type: "application/json" });
+  const adresse = URL.createObjectURL(datei);
+  const link = el("a", { href: adresse, download: "lerntool-sicherung-" + heuteText() + ".json" });
+  document.body.append(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(adresse), 1000);
+}
+
+function sicherungAbschnitt() {
+  const fehlerFeld = el("div", { hidden: true });
+
+  function fehlerZeigen(text) {
+    fehlerFeld.replaceChildren(el("p", { class: "warnung", role: "alert", text }));
+    fehlerFeld.hidden = false;
+  }
+
+  const importFeld = el("input", {
+    type: "file",
+    id: "import-datei",
+    accept: ".json,application/json",
+    onchange: () => {
+      const datei = importFeld.files[0];
+      importFeld.value = "";
+      if (!datei) return;
+      fehlerFeld.hidden = true;
+
+      const leser = new FileReader();
+      leser.onerror = () => fehlerZeigen("Die Datei konnte nicht gelesen werden.");
+      leser.onload = () => {
+        let neu;
+        try {
+          neu = sicherungPruefen(JSON.parse(leser.result));
+        } catch (fehler) {
+          fehlerZeigen(
+            fehler instanceof SyntaxError
+              ? "Die Datei ist keine gültige Sicherung des Lerntools (kein JSON-Format)."
+              : fehler.message
+          );
+          return;
+        }
+        const jetzt = daten.module.length;
+        const frage =
+          "Der Import ersetzt alle aktuellen Daten.\n\n" +
+          "Jetzt: " + jetzt + (jetzt === 1 ? " Modul" : " Module") + "\n" +
+          "In der Sicherung: " + neu.module.length + (neu.module.length === 1 ? " Modul" : " Module") + "\n\n" +
+          "Fortfahren?";
+        if (!confirm(frage)) return;
+
+        const alt = daten;
+        daten = neu;
+        if (!speichern()) {
+          daten = alt;
+          return;
+        }
+        meldung =
+          "Sicherung importiert: " + neu.module.length + (neu.module.length === 1 ? " Modul." : " Module.");
+        render();
+      };
+      leser.readAsText(datei, "UTF-8");
+    },
+  });
+
+  return abschnitt(
+    el("h2", { text: "Daten sichern" }),
+    el("p", {
+      class: "hinweis",
+      text:
+        "Deine Daten liegen nur in diesem Browser. Sichere sie ab und zu als Datei. " +
+        "Mit der Datei kannst du sie auch auf ein anderes Gerät mitnehmen.",
+    }),
+    el("button", { type: "button", class: "knopf", text: "Daten exportieren", onclick: exportieren }),
+    el("label", { for: "import-datei", text: "Sicherung importieren (.json)" }),
+    el("p", { class: "hinweis", style: "margin:0 0 6px", text: "Achtung: Der Import ersetzt alle aktuellen Daten." }),
+    importFeld,
+    fehlerFeld
+  );
 }
 
 // Farbige Countdown-Karte für ein Modul auf der Startseite.
@@ -1076,6 +1249,7 @@ if (typeof module !== "undefined" && module.exports) {
     quizErstellen,
     countdownInfo,
     fortschritt,
+    sicherungPruefen,
     tageZwischen,
     tagPlus,
     heuteText,
