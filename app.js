@@ -873,29 +873,56 @@ function zeigeKarten(modul) {
     render();
   }
 
+  // Beide Seiten liegen gleichzeitig im DOM. Beim Umdrehen wird nur eine
+  // Klasse umgeschaltet (ohne render), damit die 3D-Animation sichtbar ist.
+  const vorne = el(
+    "div",
+    { class: "karte-flaeche vorne" },
+    el("span", { class: "karte-label", text: "Vorderseite" }),
+    el("span", { text: karte.frage })
+  );
+  const hinten = el(
+    "div",
+    { class: "karte-flaeche hinten" },
+    el("span", { class: "karte-label", text: "Rückseite" }),
+    el("span", { text: karte.antwort })
+  );
   const kartenKnopf = el(
     "button",
-    {
-      type: "button",
-      class: "karte" + (s.umgedreht ? " rueckseite" : ""),
-      "aria-label": (s.umgedreht ? "Rückseite: " + karte.antwort : "Vorderseite: " + karte.frage) + ". Zum Umdrehen klicken.",
-      onclick: () => { s.umgedreht = !s.umgedreht; render(); },
-    },
-    el("span", { class: "karte-seite", text: s.umgedreht ? "Rückseite" : "Vorderseite" }),
-    el("span", { text: s.umgedreht ? karte.antwort : karte.frage })
+    { type: "button", class: "karte" },
+    el("div", { class: "karte-innen" }, vorne, hinten)
   );
+  const knopfreihe = el(
+    "div",
+    { class: "knopfreihe" },
+    el("button", { type: "button", class: "knopf", text: "Wusste ich", onclick: () => weiter(true) }),
+    el("button", { type: "button", class: "knopf-zweit", text: "Noch nicht", onclick: () => weiter(false) })
+  );
+  const tippHinweis = el("p", { class: "hinweis", text: "Tippe auf die Karte, um sie umzudrehen." });
+
+  function seiteZeigen() {
+    kartenKnopf.classList.toggle("umgedreht", s.umgedreht);
+    kartenKnopf.setAttribute(
+      "aria-label",
+      (s.umgedreht ? "Rückseite: " + karte.antwort : "Vorderseite: " + karte.frage) + " (zum Umdrehen klicken)"
+    );
+    vorne.setAttribute("aria-hidden", String(s.umgedreht));
+    hinten.setAttribute("aria-hidden", String(!s.umgedreht));
+    knopfreihe.hidden = !s.umgedreht;
+    tippHinweis.hidden = s.umgedreht;
+  }
+
+  kartenKnopf.addEventListener("click", () => {
+    s.umgedreht = !s.umgedreht;
+    seiteZeigen();
+  });
+  seiteZeigen();
 
   teile.push(
     el("p", { class: "hinweis", text: "Karte " + (s.pos + 1) + " von " + s.stapel.length }),
     kartenKnopf,
-    s.umgedreht
-      ? el(
-          "div",
-          { class: "knopfreihe" },
-          el("button", { type: "button", class: "knopf", text: "Wusste ich", onclick: () => weiter(true) }),
-          el("button", { type: "button", class: "knopf-zweit", text: "Noch nicht", onclick: () => weiter(false) })
-        )
-      : el("p", { class: "hinweis", text: "Tippe auf die Karte, um sie umzudrehen." })
+    knopfreihe,
+    tippHinweis
   );
   return teile;
 }
