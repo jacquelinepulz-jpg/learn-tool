@@ -27,7 +27,7 @@ Die App hilft Studierenden, sich auf ihre Prüfungen vorzubereiten. Sie macht zw
 - Die letzten Tage vor der Prüfung sind für die Wiederholung reserviert: 1 Tag, wenn es bis zu 7 Lerntage gibt, sonst 2 Tage.
 - Wenn es mehr Themen als Tage gibt, bekommt ein Tag mehrere Themen.
 - Wenn die Prüfung heute oder schon vorbei ist, zeigt die App einen Hinweis statt eines Plans.
-- Themen kann man als erledigt abhaken.
+- Themen kann man als erledigt abhaken und einzeln löschen (mit Nachfrage).
 - Den Plan kann man neu berechnen lassen. Dabei werden nur die noch offenen Themen auf die restlichen Tage verteilt.
 
 **Unterlagen**
@@ -74,6 +74,7 @@ Die App hilft Studierenden, sich auf ihre Prüfungen vorzubereiten. Sie macht zw
    - Ein Fortschrittsbalken zeigt, wie viele Themen erledigt sind.
    - Die Farbe zeigt, wie nah die Prüfung ist: grün ab 15 Tagen, gelb bei 7 bis 14 Tagen, rot bei unter 7 Tagen.
    - Die Karten sind nach Prüfungsdatum sortiert, die nächste Prüfung steht zuerst.
+   - Am Prüfungstag steht „Prüfung heute“ (rot). Ist die Prüfung vorbei, ist die Karte grau mit „Prüfung vorbei“ und steht am Ende der Liste.
 2. **Umdrehbare Karteikarten**
    - Die Karte dreht sich beim Klick mit einer 3D-Animation um.
    - Vorder- und Rückseite sind farblich klar unterscheidbar.
@@ -97,15 +98,23 @@ Alles liegt im `localStorage` des Browsers unter einem einzigen Schlüssel als J
 module: [
   {
     id, name, pruefungsdatum (JJJJ-MM-TT),
-    themen: [ { id, titel, tag (JJJJ-MM-TT oder "wiederholung"), erledigt (ja/nein) } ],
+    themen: [ { id, titel, tag (JJJJ-MM-TT oder leer), erledigt (ja/nein) } ],
+    wiederholung: [ JJJJ-MM-TT, … ],
     unterlagen: [
       { id, titel, text,
-        karten: [ { id, frage, antwort } ] }
+        karten: [ { id, typ ("definition" oder "luecke"), frage, antwort, begriff } ] }
     ]
   }
 ]
 ```
 
+- Der Schlüssel im Browser-Speicher heißt `lerntool-daten`.
+- `tag` ist leer, wenn ein Thema nicht eingeplant werden konnte, weil die Prüfung heute oder schon vorbei ist.
+- `wiederholung` enthält die Tage, die für die Wiederholung reserviert sind. Sie wird bei jeder Planberechnung neu gesetzt.
+- Jede Karte merkt sich, aus welchem Muster sie entstanden ist (`typ`), und den gesuchten Begriff (`begriff`):
+  - `definition` (Muster „Begriff: Erklärung“): `frage` ist der Begriff, `antwort` die Erklärung.
+  - `luecke` (Muster „ist/sind“ und **fett**): `frage` ist der Satz mit Lücke, `antwort` der Begriff.
+  - Das Quiz nutzt `begriff` als richtige Antwort und die Begriffe der anderen Karten als falsche Antworten.
 - Die Karten werden beim Anlegen der Unterlage einmal erzeugt und mitgespeichert.
 - Der Lernfortschritt bei Karteikarten und Quiz wird nicht dauerhaft gespeichert, nur während der Runde.
 
