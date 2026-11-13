@@ -207,6 +207,29 @@ function quizErstellen(karten) {
 }
 
 /* =========================================================
+   Countdown und Fortschritt (für die Startseite)
+   ========================================================= */
+
+// Farbstufe und Text für den Countdown bis zur Prüfung.
+function countdownInfo(pruefungsdatum, heute) {
+  const tage = tageZwischen(heute, pruefungsdatum);
+  if (tage < 0) return { stufe: "vorbei", text: "Prüfung vorbei" };
+  if (tage === 0) return { stufe: "rot", text: "Prüfung heute" };
+  const text = "noch " + tage + (tage === 1 ? " Tag" : " Tage");
+  if (tage >= 15) return { stufe: "gruen", text };
+  if (tage >= 7) return { stufe: "gelb", text };
+  return { stufe: "rot", text };
+}
+
+// Wie viele Themen eines Moduls erledigt sind.
+function fortschritt(modul) {
+  const gesamt = modul.themen.length;
+  const erledigt = modul.themen.filter((t) => t.erledigt).length;
+  const prozent = gesamt === 0 ? 0 : Math.round((erledigt / gesamt) * 100);
+  return { erledigt, gesamt, prozent };
+}
+
+/* =========================================================
    Speichern und Laden
    ========================================================= */
 
@@ -295,9 +318,14 @@ let meldung = null; // kurze Erfolgsmeldung für die nächste Anzeige
 // ---------- Startseite ----------
 
 function zeigeStart() {
-  const liste = daten.module
-    .slice()
-    .sort((a, b) => a.pruefungsdatum.localeCompare(b.pruefungsdatum));
+  // Nächste Prüfung zuerst, vergangene Prüfungen ans Ende.
+  const heute = heuteText();
+  const liste = daten.module.slice().sort((a, b) => {
+    const aVorbei = a.pruefungsdatum < heute;
+    const bVorbei = b.pruefungsdatum < heute;
+    if (aVorbei !== bVorbei) return aVorbei ? 1 : -1;
+    return a.pruefungsdatum.localeCompare(b.pruefungsdatum);
+  });
 
   const uebersicht = abschnitt(
     el("h2", { text: "Meine Module" }),
@@ -311,21 +339,7 @@ function zeigeStart() {
       : el(
           "ul",
           { class: "modulliste" },
-          liste.map((modul) =>
-            el(
-              "li",
-              null,
-              el(
-                "a",
-                { href: "#/modul/" + modul.id, class: "modul-link" },
-                el("span", { class: "modul-name", text: modul.name }),
-                el("span", {
-                  class: "modul-datum",
-                  text: "Prüfung: " + datumAnzeigen(modul.pruefungsdatum),
-                })
-              )
-            )
-          )
+          liste.map((modul) => el("li", null, modulKarte(modul)))
         )
   );
 
@@ -365,6 +379,44 @@ function zeigeStart() {
   );
 
   return [uebersicht, abschnitt(el("h2", { text: "+ Modul anlegen" }), formular)];
+}
+
+// Farbige Countdown-Karte für ein Modul auf der Startseite.
+function modulKarte(modul) {
+  const countdown = countdownInfo(modul.pruefungsdatum, heuteText());
+  const stand = fortschritt(modul);
+
+  const balken = el(
+    "div",
+    {
+      class: "balken",
+      role: "progressbar",
+      "aria-valuemin": 0,
+      "aria-valuemax": 100,
+      "aria-valuenow": stand.prozent,
+      "aria-label": "Fortschritt " + modul.name,
+    },
+    el("div", { class: "balken-fuellung", style: "width:" + stand.prozent + "%" })
+  );
+
+  return el(
+    "a",
+    { href: "#/modul/" + modul.id, class: "modul-link countdown-" + countdown.stufe },
+    el("span", { class: "modul-name", text: modul.name }),
+    el("span", {
+      class: "modul-datum",
+      text: "Prüfung: " + datumAnzeigen(modul.pruefungsdatum),
+    }),
+    el("span", { class: "countdown-tage", text: countdown.text }),
+    balken,
+    el("span", {
+      class: "fortschritt-text",
+      text:
+        stand.gesamt === 0
+          ? "Noch keine Themen"
+          : stand.erledigt + " von " + stand.gesamt + " Themen erledigt (" + stand.prozent + " %)",
+    })
+  );
 }
 
 // ---------- Modul-Ansicht ----------
@@ -991,5 +1043,14 @@ if (typeof document !== "undefined") {
 
 // Nur für Tests mit Node, im Browser ohne Wirkung.
 if (typeof module !== "undefined" && module.exports) {
-  module.exports = { planBerechnen, kartenErzeugen, quizErstellen, tageZwischen, tagPlus, heuteText };
+  module.exports = {
+    planBerechnen,
+    kartenErzeugen,
+    quizErstellen,
+    countdownInfo,
+    fortschritt,
+    tageZwischen,
+    tagPlus,
+    heuteText,
+  };
 }

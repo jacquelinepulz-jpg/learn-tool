@@ -13,6 +13,20 @@
   --rot: #b42318;
   --rot-hell: #fde8e6;
   --gelb-hell: #fff6dc;
+
+  /* Countdown-Stufen: Streifen/Balken, Hintergrund, Schrift */
+  --cd-gruen: #2e9e5b;
+  --cd-gruen-hell: #eef9f2;
+  --cd-gruen-text: #1a6b3c;
+  --cd-gelb: #e0a800;
+  --cd-gelb-hell: #fff8e1;
+  --cd-gelb-text: #7a5600;
+  --cd-rot: #d93a2b;
+  --cd-rot-hell: #fdeeec;
+  --cd-rot-text: #a3241a;
+  --cd-grau: #9aa0ad;
+  --cd-grau-hell: #f1f2f5;
+  --cd-grau-text: #5b6275;
 }
 
 * {
@@ -240,6 +254,54 @@ pre {
 }
 
 .modul-datum {
+  color: var(--grau);
+}
+
+/* Prüfungs-Countdown (Highlight 1) */
+.modul-link[class*="countdown-"] {
+  margin-bottom: 12px;
+  padding: 16px 16px 14px 20px;
+  border-left-width: 8px;
+  background: var(--cd-hell);
+  border-color: var(--cd-farbe);
+}
+
+.modul-link[class*="countdown-"]:hover {
+  box-shadow: 0 2px 8px rgba(31, 35, 48, 0.12);
+}
+
+.countdown-gruen { --cd-farbe: var(--cd-gruen); --cd-hell: var(--cd-gruen-hell); --cd-text: var(--cd-gruen-text); }
+.countdown-gelb { --cd-farbe: var(--cd-gelb); --cd-hell: var(--cd-gelb-hell); --cd-text: var(--cd-gelb-text); }
+.countdown-rot { --cd-farbe: var(--cd-rot); --cd-hell: var(--cd-rot-hell); --cd-text: var(--cd-rot-text); }
+.countdown-vorbei { --cd-farbe: var(--cd-grau); --cd-hell: var(--cd-grau-hell); --cd-text: var(--cd-grau-text); }
+
+.countdown-tage {
+  display: block;
+  margin: 6px 0 10px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--cd-text);
+}
+
+.balken {
+  height: 10px;
+  overflow: hidden;
+  background: rgba(31, 35, 48, 0.1);
+  border-radius: 999px;
+}
+
+.balken-fuellung {
+  height: 100%;
+  background: var(--cd-farbe);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+.fortschritt-text {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.9rem;
   color: var(--grau);
 }
 
