@@ -1,0 +1,394 @@
+/* Farben und Grundwerte */
+:root {
+  --hintergrund: #f6f7fb;
+  --flaeche: #ffffff;
+  --text: #1f2330;
+  --grau: #5b6275;
+  --rand: #d9dce5;
+  --akzent: #2f5bd3;
+  --akzent-dunkel: #2449ad;
+  --akzent-hell: #eef2fd;
+  --gruen: #1d7a3e;
+  --gruen-hell: #e3f4e9;
+  --rot: #b42318;
+  --rot-hell: #fde8e6;
+  --gelb-hell: #fff6dc;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 17px;
+  line-height: 1.5;
+  background: var(--hintergrund);
+  color: var(--text);
+}
+
+/* Kopfleiste */
+.kopfleiste {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--akzent);
+  color: #fff;
+}
+
+.kopfleiste h1 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.kopfleiste a {
+  color: #fff;
+  font-weight: 600;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 16px;
+  overflow-wrap: break-word;
+}
+
+/* Abschnitte */
+.abschnitt {
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-size: 1.25rem;
+  margin: 0 0 12px;
+}
+
+h3 {
+  font-size: 1.05rem;
+  margin: 0 0 8px;
+}
+
+/* Formulare */
+label {
+  display: block;
+  font-weight: 600;
+  margin: 12px 0 4px;
+}
+
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 10px;
+  font: inherit;
+  color: inherit;
+  background: #fff;
+  border: 1px solid var(--rand);
+  border-radius: 8px;
+}
+
+textarea {
+  resize: vertical;
+}
+
+input[type="file"] {
+  max-width: 100%;
+  font: inherit;
+}
+
+/* Knöpfe */
+.knopf,
+.knopf-zweit,
+.knopf-gefahr {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 10px 18px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  border: 2px solid var(--akzent);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.knopf {
+  background: var(--akzent);
+  color: #fff;
+}
+
+.knopf:hover {
+  background: var(--akzent-dunkel);
+  border-color: var(--akzent-dunkel);
+}
+
+.knopf-zweit {
+  background: #fff;
+  color: var(--akzent);
+}
+
+.knopf-gefahr {
+  background: #fff;
+  color: var(--rot);
+  border-color: var(--rot);
+}
+
+.knopf-klein {
+  flex-shrink: 0;
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 1.3rem;
+  color: var(--grau);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.knopfreihe {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+:focus-visible {
+  outline: 3px solid #f0b400;
+  outline-offset: 2px;
+}
+
+/* Meldungen */
+.hinweis {
+  color: var(--grau);
+}
+
+.warnung {
+  margin-top: 12px;
+  padding: 12px;
+  background: var(--gelb-hell);
+  border: 1px solid #e8c766;
+  border-radius: 8px;
+}
+
+.erfolg {
+  margin-bottom: 16px;
+  padding: 12px;
+  background: var(--gruen-hell);
+  border: 1px solid #9fd3b1;
+  border-radius: 8px;
+}
+
+.tipp {
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 0.95rem;
+  background: var(--akzent-hell);
+  border-radius: 8px;
+}
+
+.tipp ul,
+.warnung ul {
+  margin: 6px 0 0;
+  padding-left: 20px;
+}
+
+pre {
+  white-space: pre-wrap;
+  padding: 8px;
+  font-size: 0.9rem;
+  background: #fff;
+  border-radius: 6px;
+}
+
+/* Listen */
+.modulliste,
+.plan,
+.themenliste,
+.unterlagenliste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.modul-link {
+  display: block;
+  margin-bottom: 8px;
+  padding: 14px;
+  color: inherit;
+  text-decoration: none;
+  background: var(--flaeche);
+  border: 1px solid var(--rand);
+  border-radius: 10px;
+}
+
+.modul-link:hover {
+  border-color: var(--akzent);
+}
+
+.modul-name {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.modul-datum {
+  color: var(--grau);
+}
+
+/* Lernplan */
+.plantag {
+  margin-bottom: 8px;
+  padding: 8px 0 8px 12px;
+  border-left: 4px solid var(--rand);
+}
+
+.plantag.heute {
+  background: var(--akzent-hell);
+  border-left-color: var(--akzent);
+  border-radius: 0 8px 8px 0;
+}
+
+.plantag.vergangen h3 {
+  color: var(--grau);
+}
+
+.thema {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.thema input {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+}
+
+.thema label {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 8px 0;
+  font-weight: 400;
+  cursor: pointer;
+}
+
+.thema.erledigt label {
+  color: var(--grau);
+  text-decoration: line-through;
+}
+
+/* Unterlagen */
+.unterlage {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--rand);
+}
+
+.unterlage-titel {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+}
+
+.unterlage .knopf-gefahr {
+  margin-top: 0;
+}
+
+/* Karteikarten */
+.karte {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 220px;
+  padding: 24px;
+  font: inherit;
+  font-size: 1.2rem;
+  color: inherit;
+  text-align: center;
+  background: #fff;
+  border: 2px solid var(--akzent);
+  border-radius: 16px;
+  cursor: pointer;
+}
+
+.karte.rueckseite {
+  background: var(--akzent-hell);
+}
+
+.karte-seite {
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: var(--grau);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Quiz */
+.frage-text {
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.antworten {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.antwort {
+  min-height: 48px;
+  padding: 10px 14px;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: #fff;
+  border: 2px solid var(--rand);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.antwort:hover:not(:disabled) {
+  border-color: var(--akzent);
+}
+
+.antwort:disabled {
+  cursor: default;
+}
+
+.antwort.richtig {
+  font-weight: 600;
+  color: var(--gruen);
+  background: var(--gruen-hell);
+  border-color: var(--gruen);
+}
+
+.antwort.falsch {
+  color: var(--rot);
+  background: var(--rot-hell);
+  border-color: var(--rot);
+}
+
+.ergebnis {
+  font-size: 1.4rem;
+  font-weight: 700;
+}
+
+.zurueck {
+  display: inline-block;
+  margin-bottom: 12px;
+}
