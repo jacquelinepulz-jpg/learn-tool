@@ -62,6 +62,10 @@ Die App hilft Studierenden, sich auf ihre Prüfungen vorzubereiten. Sie macht zw
 - Nach dem Klick auf eine Antwort sieht man sofort, ob sie richtig war. Die richtige Antwort wird grün markiert.
 - Ein Quiz hat höchstens 10 Fragen in zufälliger Reihenfolge.
 - Am Ende sieht man die Punktzahl, zum Beispiel „7 von 10 richtig“.
+- **Fehler wiederholen** (nachträglich ergänzt):
+  - Unter der Punktzahl stehen alle falsch beantworteten Fragen, jeweils mit der eigenen Antwort und der richtigen Lösung.
+  - Der Knopf „Nur diese nochmal“ startet ein Quiz nur mit diesen Fragen. Die Antworten erscheinen dabei in neuer Reihenfolge.
+  - Das geht so oft, bis alle richtig sind. Dann erscheint „Alles richtig!“.
 
 **Speichern**
 - Alle Daten werden automatisch im Browser gespeichert.
@@ -144,6 +148,7 @@ Gestaltung:
 - Die Knöpfe sind groß genug für Finger.
 - Gut lesbare Schrift mit genug Kontrast.
 - Die ganze Oberfläche ist auf Deutsch.
+- **Dunkles Design** (nachträglich ergänzt): Ist auf dem Gerät der dunkle Modus eingestellt, zeigt die App automatisch dunkle Farben. Es gibt keinen eigenen Schalter in der App. Auch Eingabefelder und Datumsauswahl werden dunkel, und Ampelfarben, Karteikarten und Quiz-Markierungen bleiben gut lesbar.
 
 ## 6. Technik und Grenzen
 
@@ -196,3 +201,5 @@ Nachträglich ergänzt:
 17. Ich lösche ein Modul und importiere danach die Sicherung. Nach der Nachfrage ist alles wieder da, auch nach dem Neuladen.
 18. Beim Import einer falschen Datei (z. B. einer beliebigen .txt- oder .json-Datei) erscheint eine verständliche Meldung, und meine Daten bleiben unverändert.
 19. Die App öffnet sich unter https://jacquelinepulz-jpg.github.io/learn-tool/ und funktioniert dort genauso wie lokal.
+20. Ich beantworte im Quiz 2 Fragen falsch. Am Ende sehe ich genau diese 2 Fragen mit meiner Antwort und der richtigen Lösung. „Nur diese nochmal“ startet ein Quiz mit genau 2 Fragen.
+21. Ich stelle das Gerät auf den dunklen Modus. Die App wird ohne Neuladen dunkel, und alle Texte sind gut lesbar.

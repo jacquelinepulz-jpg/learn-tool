@@ -1102,6 +1102,66 @@ function zeigeKarten(modul) {
 
 // ---------- Quiz ----------
 
+// Ergebnis am Ende eines Quiz, mit Liste der Fehler und „Nur diese nochmal“.
+function quizErgebnis(s, modulLink) {
+  const inhalt = [
+    s.nurFehler ? el("p", { class: "hinweis", text: "Wiederholung der Fehler" }) : null,
+    el("p", { class: "ergebnis", text: s.punkte + " von " + s.fragen.length + " richtig" }),
+  ];
+
+  if (s.fehler.length === 0) {
+    inhalt.push(el("p", { class: "erfolg", role: "status", text: "Alles richtig!" }));
+  } else {
+    inhalt.push(
+      el("h3", { text: "Diese Fragen waren falsch:" }),
+      el(
+        "ul",
+        { class: "fehlerliste" },
+        s.fehler.map(({ frage, gewaehlt }) =>
+          el(
+            "li",
+            null,
+            el("p", { class: "frage-text", text: frage.text }),
+            el("p", { class: "antwort-falsch", text: "Deine Antwort: " + gewaehlt }),
+            el("p", { class: "antwort-richtig", text: "Richtig: " + frage.richtig })
+          )
+        )
+      )
+    );
+  }
+
+  const knoepfe = [];
+  if (s.fehler.length > 0) {
+    knoepfe.push(
+      el("button", {
+        type: "button",
+        class: "knopf",
+        text: "Nur diese nochmal",
+        onclick: () => {
+          const fragen = mischen(s.fehler.map(({ frage }) => ({ ...frage, optionen: mischen(frage.optionen) })));
+          sitzung = { fragen, pos: 0, punkte: 0, gewaehlt: null, fehler: [], nurFehler: true };
+          render();
+        },
+      })
+    );
+  }
+  knoepfe.push(
+    el("button", {
+      type: "button",
+      class: s.fehler.length > 0 ? "knopf-zweit" : "knopf",
+      text: "Neues Quiz",
+      onclick: () => {
+        sitzung = null;
+        render();
+      },
+    }),
+    el("a", { href: modulLink, class: "knopf-zweit", text: "Zurück zum Modul" })
+  );
+  inhalt.push(el("div", { class: "knopfreihe" }, knoepfe));
+
+  return abschnitt(inhalt);
+}
+
 function zeigeQuiz(modul) {
   const modulLink = "#/modul/" + modul.id;
   const teile = [zurueckLink(modulLink, "Zurück zum Modul"), el("h2", { text: "Quiz: " + modul.name })];
@@ -1119,22 +1179,12 @@ function zeigeQuiz(modul) {
       );
       return teile;
     }
-    sitzung = { fragen, pos: 0, punkte: 0, gewaehlt: null };
+    sitzung = { fragen, pos: 0, punkte: 0, gewaehlt: null, fehler: [], nurFehler: false };
   }
   const s = sitzung;
 
   if (s.pos >= s.fragen.length) {
-    teile.push(
-      abschnitt(
-        el("p", { class: "ergebnis", text: s.punkte + " von " + s.fragen.length + " richtig" }),
-        el(
-          "div",
-          { class: "knopfreihe" },
-          el("button", { type: "button", class: "knopf", text: "Neues Quiz", onclick: () => { sitzung = null; render(); } }),
-          el("a", { href: modulLink, class: "knopf-zweit", text: "Zurück zum Modul" })
-        )
-      )
-    );
+    teile.push(quizErgebnis(s, modulLink));
     return teile;
   }
 
@@ -1156,6 +1206,7 @@ function zeigeQuiz(modul) {
         onclick: () => {
           s.gewaehlt = option;
           if (option === frage.richtig) s.punkte++;
+          else s.fehler.push({ frage, gewaehlt: option });
           render();
         },
       });
